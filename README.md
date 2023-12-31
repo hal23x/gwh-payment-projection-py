@@ -16,6 +16,10 @@ An example configuration file containing output file settings.
 
 An example configuration file containing examples of regular employment income, expenses and recurring bills, and one time expenses.
 
+## Prerequisites
+
+This script uses Python 3, and requires the packages pyyaml and pandas.
+
 ## Usage
 
 ### Command Line
