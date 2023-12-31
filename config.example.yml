@@ -1,0 +1,5 @@
+outputControl:
+  startDate: 2023-12-21
+  endDate: 2025-01-14
+  displayEarlyPaymentDates: False
+  checkRegisterFormat: True
