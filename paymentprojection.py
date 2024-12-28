@@ -32,9 +32,11 @@ def print_usage():
 def parse_arguments():
     """Parse the command line arguments"""
 
+    global config_files
+
     for arg in sys.argv:
         if arg == '--help':
-            config_files = []
+            config_files.clear()
             break
         
         if arg.endswith('.yml'):
@@ -48,18 +50,31 @@ def parse_arguments():
 def read_config():
     """Read the configuration files"""
 
+    global config_files
+    global config
+    global budgetData
+
     for currFile in config_files:
+        print(f'Reading configuration file {currFile}...', end='')
+
         with open(currFile, 'r') as stream:
             try:
-                yaml_dict: dict = yaml.load(stream, Loader=yaml.SafeLoader)
+                yaml_dict = yaml.load(stream, Loader=yaml.SafeLoader)
 
-                if config is None and 'outputControl' in yaml_dict:
+                if 'outputControl' in yaml_dict:
+                    print('found outputControl section')
                     config = yaml_dict
-                elif budgetData is None:
-                    budgetData = yaml_dict
                 else:
-                    budgetData.update(yaml_dict)
+                    print('found budget data section')
+
+                    if budgetData is None:
+                        budgetData = yaml_dict
+                    else:
+                        for item in yaml_dict:
+                            budgetData.append(item)
+
             except yaml.YAMLError as exc:
+                print('')
                 print(f'ERROR:  Failed to read {currFile}:')
                 print(exc)
                 sys.exit(1)
@@ -95,10 +110,14 @@ def check_config():
     global outputFile
     global displayEarlyPaymentDates
 
+    print('Checking configuration...')
+
     errors = []
 
     if 'outputControl' not in config:
         errors.append('outputControl not found in config file')
+
+    outputControl = config['outputControl']
 
     if 'startDate' not in outputControl:
         errors.append('startDate not found in config outputControl section')
@@ -111,11 +130,13 @@ def check_config():
 
     if len(errors) > 0:
         print('Configuration errors found:')
+
         for error in errors:
             print(f'  {error}')
         sys.exit(1)
 
-    outputControl = config['outputControl']
+    print('Configuration checks passed')
+
     outputStartDate = pandas.Timestamp(outputControl['startDate'])
     outputEndDate = pandas.Timestamp(outputControl['endDate'])
 
@@ -133,6 +154,8 @@ def main():
     read_config()
     check_config()
     print_config()
+
+    print('Processing budget data...')
 
     outputBudgetDataFrame = pandas.DataFrame()
 
@@ -327,7 +350,7 @@ def main():
 
     # write the output budget data
     outputBudgetDataFrame.to_csv(outputFile, index=False)
-    print('Output written to output.csv, exiting...')
+    print(f'Output written to {outputFile}, exiting...')
 
 
 try:
