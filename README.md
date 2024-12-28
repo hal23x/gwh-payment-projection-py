@@ -26,9 +26,9 @@ This script uses Python 3, and requires the packages pyyaml and pandas.
 
 Command line usage is as follows.
 
-`python3 paymentprojection.py config.yml`
+`python3 paymentprojection.py config.yml budgetitems.yml`
 
-Where "config.yml" is the configuration file.  Configuration files may be broken up into more than one file for easier organization of output configuration, income, and expenses.  For example, if output configuration, income, and expenses are moved to a subfolder called `config`, the command line may look like this.
+Where "config.yml" is a YAML file containing the output control configuration, and "budgetitems.yml" is a YAML file containing one or more individual budget items.  The "config.yml" file must contain only the "outputControl" object (and any sub-objects).  Budget item configuration may be broken up into more than one file for easier organization of budget items.  For example, if output configuration, income, and expenses are moved to a subfolder called `config`, the command line may look like this.
 
 `python3 paymentprojection.py config/output-csv.yml config/income.yml config/regular-bills.yml config/one-time-expenses.yml`
 
