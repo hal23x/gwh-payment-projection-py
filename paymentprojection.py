@@ -211,6 +211,7 @@ def main():
         itemAmount = item['amount']
         itemNote = item['note'] if 'note' in item else ''
         finalDate = nextDate
+        increment_count = 1
 
         # find the first date to process
         while nextDate <= itemEndDate or finalDate <= itemEndDate:
@@ -226,22 +227,24 @@ def main():
                     print(f'  Adding regular interval date {nextDate.strftime("%Y-%m-%d")}, with adjusted final date of {finalDate.strftime("%Y-%m-%d")}')
 
             if frequencyType == 'monthly':
-                nextDate = nextDate + pandas.DateOffset(months=frequencyValue)
+                nextDate = itemStartDate + pandas.DateOffset(months=frequencyValue * increment_count)
 
                 if 'endOfMonth' in item and item['endOfMonth'] == True:
                     nextDate = nextDate + pandas.offsets.MonthEnd(0)
             elif frequencyType == 'weekly':
-                nextDate = nextDate + pandas.DateOffset(weeks=frequencyValue)
+                nextDate = itemStartDate + pandas.DateOffset(weeks=frequencyValue * increment_count)
             elif frequencyType == 'daily':
-                nextDate = nextDate + pandas.DateOffset(days=frequencyValue)
+                nextDate = itemStartDate + pandas.DateOffset(days=frequencyValue * increment_count)
             elif frequencyType == 'yearly':
-                nextDate = nextDate + pandas.DateOffset(years=frequencyValue)
+                nextDate = itemStartDate + pandas.DateOffset(years=frequencyValue * increment_count)
             elif frequencyType == 'single':
                 nextDate = itemEndDate + pandas.DateOffset(days=1)
                 finalDate = nextDate
             else:
                 print(f'ERROR:  Invalid frequency type {frequencyType} for item {itemName}')
                 sys.exit(1)
+
+            increment_count += 1
 
         # add in date exceptions that fall within the output range
         if 'dateExceptions' in item:
@@ -349,7 +352,8 @@ def main():
     # print(outputBudgetDataFrame)
 
     # write the output budget data
-    outputBudgetDataFrame.to_csv(outputFile, index=False)
+    output_separater = '\t' if 'tabbedOutput' in outputControl and outputControl['tabbedOutput'] == True else ','
+    outputBudgetDataFrame.to_csv(outputFile, index=False, sep=output_separater)
     print(f'Output written to {outputFile}, exiting...')
 
 
