@@ -161,4 +161,5 @@ cython_debug/
 
 # Local usage configuration
 config/**
-output.csv
+output/**
+output*
